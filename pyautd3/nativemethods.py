@@ -80,9 +80,6 @@ def __init_property():
     autddll.AUTDNumTransducers.argtypes = [c_void_p]
     autddll.AUTDNumTransducers.restypes = [c_int]
 
-    autddll.AUTDFrequency.argtypes = [c_void_p]
-    autddll.AUTDFrequency.restypes = [c_float]
-
     autddll.AUTDRemainingInBuffer.argtypes = [c_void_p]
     autddll.AUTDRemainingInBuffer.restypes = [c_long]
 
@@ -103,10 +100,6 @@ def __init_gain():
     autddll.AUTDPlaneWaveGain.argtypes = [
         POINTER(c_void_p), c_float, c_float, c_float]
     autddll.AUTDPlaneWaveGain.restypes = [None]
-
-    autddll.AUTDMatlabGain.argtypes = [
-        POINTER(c_void_p), c_char_p, c_char_p]
-    autddll.AUTDMatlabGain.restypes = [None]
 
     autddll.AUTDCustomGain.argtypes = [
         POINTER(c_void_p), POINTER(c_ubyte), c_int]
