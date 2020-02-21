@@ -11,9 +11,9 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 '''
 
-from pyautd.autd import LinkType
-from pyautd.nativemethods import init_autd3
-from pyautd.autd import AUTD
+from pyautd3.autd import LinkType
+from pyautd3.nativemethods import init_autd3
+from pyautd3.autd import AUTD
 import os.path
 
 __all__ = ['LinkType', 'AUTD']

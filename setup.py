@@ -18,7 +18,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     include_package_data=True,
-    package_dir={'pyautd3': 'pyautd'},
+    package_dir={'pyautd3': 'pyautd3'},
     packages=['pyautd3'],
     package_data={
         'pyautd3': ['*.dll'],
