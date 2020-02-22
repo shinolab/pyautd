@@ -11,7 +11,7 @@ pip install git+https://github.com/shinolab/pyautd.git
 ## Exmaple
 
 ```
-from pyautd import *
+from pyautd3 import *
 import sys
 
 
@@ -25,9 +25,6 @@ def get_adapter_name():
 
 
 if __name__ == '__main__':
-    dll_location = './autd3capi.dll'
-    init_autd3(dll_location)
-
     adapter = get_adapter_name()
 
     autd = AUTD()

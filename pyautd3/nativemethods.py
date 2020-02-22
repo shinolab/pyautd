@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 21/02/2020
+Last Modified: 22/02/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,7 +12,7 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 '''
 
 import ctypes
-from ctypes import c_void_p, c_bool, c_int, create_string_buffer, byref, POINTER, c_float, c_long, c_char, c_char_p, c_ubyte
+from ctypes import c_void_p, c_bool, c_int, create_string_buffer, byref, POINTER, c_double, c_long, c_char, c_char_p, c_ubyte
 
 
 def init_autd3(dlllocation):
@@ -44,11 +44,11 @@ def __init_controller():
     autddll.AUTDFreeAdapterPointer.restypes = [None]
 
     autddll.AUTDAddDevice.argtypes = [
-        c_void_p, c_float, c_float, c_float, c_float, c_float, c_float, c_int]
+        c_void_p, c_double, c_double, c_double, c_double, c_double, c_double, c_int]
     autddll.AUTDAddDevice.restypes = [c_int]
 
     autddll.AUTDAddDeviceQuaternion.argtypes = [
-        c_void_p, c_float, c_float, c_float, c_float, c_float, c_float,  c_float, c_int]
+        c_void_p, c_double, c_double, c_double, c_double, c_double, c_double,  c_double, c_int]
     autddll.AUTDAddDeviceQuaternion.restypes = [c_int]
 
     autddll.AUTDDelDevice.argtypes = [c_void_p, c_int]
@@ -86,7 +86,7 @@ def __init_property():
 
 def __init_gain():
     autddll.AUTDFocalPointGain.argtypes = [
-        POINTER(c_void_p), c_float, c_float, c_float, c_ubyte]
+        POINTER(c_void_p), c_double, c_double, c_double, c_ubyte]
     autddll.AUTDFocalPointGain.restypes = [None]
 
     autddll.AUTDGroupedGain.argtypes = [
@@ -94,11 +94,11 @@ def __init_gain():
     autddll.AUTDGroupedGain.restypes = [None]
 
     autddll.AUTDBesselBeamGain.argtypes = [
-        POINTER(c_void_p), c_float, c_float, c_float, c_float, c_float, c_float, c_float]
+        POINTER(c_void_p), c_double, c_double, c_double, c_double, c_double, c_double, c_double]
     autddll.AUTDBesselBeamGain.restypes = [None]
 
     autddll.AUTDPlaneWaveGain.argtypes = [
-        POINTER(c_void_p), c_float, c_float, c_float]
+        POINTER(c_void_p), c_double, c_double, c_double]
     autddll.AUTDPlaneWaveGain.restypes = [None]
 
     autddll.AUTDCustomGain.argtypes = [
@@ -106,7 +106,7 @@ def __init_gain():
     autddll.AUTDCustomGain.restypes = [None]
 
     autddll.AUTDHoloGain.argtypes = [
-        POINTER(c_void_p), POINTER(c_float), POINTER(c_float), c_int]
+        POINTER(c_void_p), POINTER(c_double), POINTER(c_double), c_int]
     autddll.AUTDHoloGain.restypes = [None]
 
     autddll.AUTDTransducerTestGain.argtypes = [
@@ -127,7 +127,7 @@ def __init_modulation():
     autddll.AUTDModulation.restypes = [None]
 
     autddll.AUTDRawPCMModulation.argtypes = [
-        POINTER(c_void_p), c_char_p, c_float]
+        POINTER(c_void_p), c_char_p, c_double]
     autddll.AUTDRawPCMModulation.restypes = [None]
 
     autddll.AUTDRawPCMModulation.argtypes = [
@@ -135,7 +135,7 @@ def __init_modulation():
     autddll.AUTDRawPCMModulation.restypes = [None]
 
     autddll.AUTDSineModulation.argtypes = [
-        POINTER(c_void_p), c_int, c_float, c_float]
+        POINTER(c_void_p), c_int, c_double, c_double]
     autddll.AUTDSineModulation.restypes = [None]
 
     autddll.AUTDDeleteModulation.argtypes = [c_void_p]
@@ -164,7 +164,7 @@ def __init_low_level_interface():
     autddll.AUTDAppendSTMGain.restypes = [None]
 
     autddll.AUTDStartSTModulation.argtypes = [
-        c_void_p, c_float]
+        c_void_p, c_double]
     autddll.AUTDStartSTModulation.restypes = [None]
 
     autddll.AUTDStopSTModulation.argtypes = [
