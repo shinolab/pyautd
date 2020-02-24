@@ -1,11 +1,11 @@
-## pyautd3
+# pyautd3
 
-autd3 library for python3.6+
+[autd3 library](https://github.com/shinolab/autd3-library-software) for python3.6+
 
 ## Install
 
 ```
-pip install git+https://github.com/shinolab/pyautd.git
+pip install git+https://github.com/shinolab/pyautd.git@v0.3
 ```
 
 ## Exmaple
