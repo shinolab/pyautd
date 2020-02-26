@@ -25,7 +25,11 @@ jobs:
         pip install flake8
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
-    # - name: Test with pytest
+    - name: Install Test with pip
+      run: pip install git+https://github.com/shinolab/pyautd.git
+    # In Windows, "The specified module could not be found" error will occur because Npcap or WinPCap is not installed...
+    # - name: Import Test
     #   run: |
-    #     pip install pytest
-    #     pytest
+    #     mkdir tmp
+    #     cd tmp
+    #     python -c "import pyautd3; print(pyautd3.__version__)"

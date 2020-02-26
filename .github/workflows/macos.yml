@@ -25,7 +25,10 @@ jobs:
         pip install flake8
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
-    # - name: Test with pytest
-    #   run: |
-    #     pip install pytest
-    #     pytest
+    - name: Install Test with pip
+      run: pip install git+https://github.com/shinolab/pyautd.git
+    - name: Import Test
+      run: |
+        mkdir tmp
+        cd tmp
+        python -c "import pyautd3; print(pyautd3.__version__)"

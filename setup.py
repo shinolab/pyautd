@@ -6,6 +6,26 @@ import zipfile
 import os
 import tarfile
 
+
+def _get_version():
+    with open('readme.md', 'r') as f:
+        for line in f.readlines():
+            if line.startswith('version: '):
+                ver = line.replace('version: ', '')
+                return '.'.join(ver.split('.')[0:3])
+    raise LookupError('version info is not found in readme.md')
+
+
+def _set_package_version(version):
+    init_py = ''
+    with open('pyautd3/__init__.py', 'r') as f:
+        init_py = f.read()
+
+    init_py = init_py.replace('VERSION_PLACEHOLDER', version)
+    with open('pyautd3/__init__.py', 'w') as f:
+        f.write(init_py)
+
+
 _pf = platform.system()
 _os = ''
 _lib_ext = ''
@@ -22,12 +42,12 @@ else:
     raise ImportError('Not supported OS')
 
 _AssetsBaseURL = 'https://github.com/shinolab/autd3-library-software/releases/download/'
-_Version = 'v0.3.0'
+_Version = 'v' + _get_version()
+_set_package_version(_get_version())
 
 module_path = './pyautd3/'
 ext = '.zip' if _os.startswith('win') else '.tar.gz'
 url = _AssetsBaseURL + _Version + '/autd3-' + _Version + '-' + _os + ext
-print(url)
 
 tmp_archive_path = module_path + 'tmp' + ext
 
@@ -55,7 +75,7 @@ with open('readme.md', 'r') as fh:
 
 setuptools.setup(
     name='pyautd3',
-    version='0.3.0',
+    version=_get_version(),
     author='Shun Suzuki',
     author_email='suzuki@hapis.k.u-tokyo.ac.jp',
     description='AUTD3 library wrapper for python',

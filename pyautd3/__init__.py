@@ -30,6 +30,7 @@ elif pf == 'Linux':
     ext = '.so'
 
 __all__ = ['LinkType', 'AUTD']
+__version__ = 'VERSION_PLACEHOLDER'
 
 lib_path = os.path.join(os.path.dirname(__file__),
                         'bin', prefix + 'autd3capi' + ext)
