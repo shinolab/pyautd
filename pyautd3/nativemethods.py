@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 22/02/2020
+Last Modified: 26/02/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,7 +12,7 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 '''
 
 import ctypes
-from ctypes import c_void_p, c_bool, c_int, create_string_buffer, byref, POINTER, c_double, c_long, c_char, c_char_p, c_ubyte
+from ctypes import c_void_p, c_bool, c_int, POINTER, c_double, c_long, c_char_p, c_ubyte
 
 
 def init_autd3(dlllocation):

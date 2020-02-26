@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 11/02/2020
+Last Modified: 26/02/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,8 +12,7 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 '''
 
 import ctypes
-from ctypes import c_void_p, byref, create_string_buffer, c_char, c_char_p
-import sys
+from ctypes import c_void_p, byref
 from enum import IntEnum
 
 from . import nativemethods
@@ -77,13 +76,13 @@ class AUTD:
         nativemethods.autddll.AUTDCloseController(self.autd)
 
     def free(self):
-        if not self.__disposed:
-            nativemethods.autddll.AUTDFreeController(self.autd)
-            self.__disposed = True
+        nativemethods.autddll.AUTDFreeController(self.autd)
 
     def dispose(self):
-        self.close()
-        self.free()
+        if not self.__disposed:
+            self.close()
+            self.free()
+            self.__disposed = True
 
     def set_silent(self, silent: bool):
         nativemethods.autddll.AUTDSetSilentMode(self.autd, silent)

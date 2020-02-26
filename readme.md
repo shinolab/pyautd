@@ -1,3 +1,7 @@
+![Windows](https://github.com/shinolab/pyautd/workflows/Windows/badge.svg)
+![Linux](https://github.com/shinolab/pyautd/workflows/Linux/badge.svg)
+![MacOS](https://github.com/shinolab/pyautd/workflows/MacOS/badge.svg)
+
 # pyautd3
 
 [autd3 library](https://github.com/shinolab/autd3-library-software) for python3.6+
@@ -7,6 +11,18 @@
 ```
 pip install git+https://github.com/shinolab/pyautd.git@v0.3
 ```
+
+## Requirements
+
+If you are using Windows, install [Npcap](https://nmap.org/npcap/) with WinPcap API-compatible mode (recomennded) or [WinPcap](https://www.winpcap.org/).
+
+If you are using Linux/MacOS, you may need to install and run pyautd3 as root. 
+
+```
+sudo pip install git+https://github.com/shinolab/pyautd.git@v0.3
+sudo python
+>>> import pyautd3
+``` 
 
 ## Exmaple
 
