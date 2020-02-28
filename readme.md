@@ -6,7 +6,7 @@
 
 [autd3 library](https://github.com/shinolab/autd3-library-software) for python3.6+
 
-version: 0.3.1.3
+version: 0.3.1.4
 
 ## Install
 
