@@ -6,7 +6,7 @@
 
 [autd3 library](https://github.com/shinolab/autd3-library-software) for python3.6+
 
-version: 0.3.0.0
+version: 0.3.1.0
 
 ## Install
 
@@ -19,7 +19,6 @@ pip install git+https://github.com/shinolab/pyautd.git
 If you are using Windows, install [Npcap](https://nmap.org/npcap/) with WinPcap API-compatible mode (recomennded) or [WinPcap](https://www.winpcap.org/).
 
 If you are using Linux/MacOS, you may need to install and run pyautd3 as root. 
-
 ```
 sudo pip install git+https://github.com/shinolab/pyautd.git
 sudo python
