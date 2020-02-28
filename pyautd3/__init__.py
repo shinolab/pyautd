@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 26/02/2020
+Last Modified: 28/02/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -30,7 +30,7 @@ elif pf == 'Linux':
     ext = '.so'
 
 __all__ = ['LinkType', 'AUTD']
-__version__ = 'VERSION_PLACEHOLDER'
+__version__ = '0.3.1.3'
 
 lib_path = os.path.join(os.path.dirname(__file__),
                         'bin', prefix + 'autd3capi' + ext)

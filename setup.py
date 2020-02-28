@@ -11,17 +11,18 @@ def _get_version():
     with open('readme.md', 'r') as f:
         for line in f.readlines():
             if line.startswith('version: '):
-                ver = line.replace('version: ', '')
-                return '.'.join(ver.split('.')[0:3])
+                return line.replace('version: ', '')
     raise LookupError('version info is not found in readme.md')
 
 
 def _set_package_version(version):
     init_py = ''
     with open('pyautd3/__init__.py', 'r') as f:
-        init_py = f.read()
+        for line in f.readlines():
+            if line.startswith('__version__'):
+                line = '__version__ = \'' + version.strip() + '\'\n'
+            init_py = init_py + line
 
-    init_py = init_py.replace('VERSION_PLACEHOLDER', version)
     with open('pyautd3/__init__.py', 'w') as f:
         f.write(init_py)
 
@@ -42,7 +43,8 @@ else:
     raise ImportError('Not supported OS')
 
 _AssetsBaseURL = 'https://github.com/shinolab/autd3-library-software/releases/download/'
-_Version = 'v' + _get_version()
+_Version = 'v' + '.'.join(_get_version().split('.')[0:3])
+_Version = _Version.strip()
 _set_package_version(_get_version())
 
 module_path = './pyautd3/'
