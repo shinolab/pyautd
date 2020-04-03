@@ -31,8 +31,9 @@ sudo python
 ## Exmaple
 
 ```python
-from pyautd3 import *
 import sys
+
+from pyautd3 import AUTD, LinkType
 
 
 def get_adapter_name():
@@ -45,14 +46,18 @@ def get_adapter_name():
 
 
 if __name__ == '__main__':
-    adapter = get_adapter_name()
+    ifname = get_adapter_name()
 
     autd = AUTD()
 
     autd.add_device([0, 0, 0], [0, 0, 0])
     # autd.add_device([0, 0, 0], [0, 0, 0])
 
-    autd.open(LinkType.SOEM, adapter)
+    autd.open(LinkType.SOEM, ifname)
+
+    firm_info_list = autd.firmware_info_list()
+    for i, firm in enumerate(firm_info_list):
+        print('[' + str(i) + ']: CPU: ' + firm[0] + ', FPGA' + firm[1])
 
     f = AUTD.focal_point_gain(90, 80, 150)
     m = AUTD.sine_modulation(150)
