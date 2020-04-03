@@ -1,4 +1,4 @@
-name: Windows
+name: build
 
 on:
   push:
@@ -9,10 +9,11 @@ on:
 
 jobs:
   build:
-
-    runs-on: windows-latest
+    name: build ${{ matrix.os }} with python  ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: [3.6, 3.7, 3.8]
 
     steps:
@@ -32,9 +33,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
     - name: Install Test with pip
       run: pip install git+https://github.com/shinolab/pyautd.git
-    # In Windows, "The specified module could not be found" error will occur because Npcap or WinPCap is not installed...
-    # - name: Import Test
-    #   run: |
-    #     mkdir tmp
-    #     cd tmp
-    #     python -c "import pyautd3; print(pyautd3.__version__)"
+    - name: Import Test
+      if: matrix.os != 'windows-latest'
+      run: |
+        mkdir tmp
+        cd tmp
+        python -c "import pyautd3; print(pyautd3.__version__)"

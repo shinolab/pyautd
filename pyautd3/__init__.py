@@ -4,34 +4,35 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 28/02/2020
+Last Modified: 03/04/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 '''
 
-from pyautd3.autd import LinkType
-from pyautd3.nativemethods import init_autd3
-from pyautd3.autd import AUTD
 import os.path
 import platform
 
-pf = platform.system()
-prefix = ''
-ext = ''
-if pf == 'Windows':
-    ext = '.dll'
-elif pf == 'Darwin':
-    prefix = 'lib'
-    ext = '.dylib'
-elif pf == 'Linux':
-    prefix = 'lib'
-    ext = '.so'
+from pyautd3.autd import LinkType
+from pyautd3.nativemethods import Nativemethods
+from pyautd3.autd import AUTD
+
+PLATFORM = platform.system()
+PREFIX = ''
+EXT = ''
+if PLATFORM == 'Windows':
+    EXT = '.dll'
+elif PLATFORM == 'Darwin':
+    PREFIX = 'lib'
+    EXT = '.dylib'
+elif PLATFORM == 'Linux':
+    PREFIX = 'lib'
+    EXT = '.so'
 
 __all__ = ['LinkType', 'AUTD']
-__version__ = '0.3.1.3'
+__version__ = '0.4.0.0'
 
-lib_path = os.path.join(os.path.dirname(__file__),
-                        'bin', prefix + 'autd3capi' + ext)
-init_autd3(lib_path)
+LIB_PATH = os.path.join(os.path.dirname(__file__),
+                        'bin', PREFIX + 'autd3capi' + EXT)
+_ = Nativemethods(LIB_PATH)

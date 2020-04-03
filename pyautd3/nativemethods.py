@@ -4,173 +4,191 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 26/02/2020
+Last Modified: 03/04/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 '''
-
+import threading
 import ctypes
 from ctypes import c_void_p, c_bool, c_int, POINTER, c_double, c_long, c_char_p, c_ubyte
 
 
-def init_autd3(dlllocation):
-    global autddll
-    autddll = ctypes.CDLL(dlllocation)
+class Nativemethods:
+    _instance = None
+    dll = None
+    _lock = threading.Lock()
 
-    __init_controller()
-    __init_property()
-    __init_gain()
-    __init_modulation()
-    __init_low_level_interface()
+    def __new__(cls, dlllocation):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super().__new__(cls)
+                cls._instance.dll = ctypes.CDLL(dlllocation)
+                cls._instance.init_controller()
+                cls._instance.init_property()
+                cls._instance.init_gain()
+                cls._instance.init_modulation()
+                cls._instance.init_low_level_interface()
 
+        return cls._instance
 
-def __init_controller():
-    autddll.AUTDCreateController.argtypes = [POINTER(c_void_p)]
-    autddll.AUTDCreateController.restypes = [None]
+    def init_controller(self):
+        self.dll.AUTDCreateController.argtypes = [POINTER(c_void_p)]
+        self.dll.AUTDCreateController.restypes = [None]
 
-    autddll.AUTDOpenController.argtypes = [c_void_p, c_int, c_char_p]
-    autddll.AUTDOpenController.restypes = [c_int]
+        self.dll.AUTDOpenController.argtypes = [c_void_p, c_int, c_char_p]
+        self.dll.AUTDOpenController.restypes = [c_int]
 
-    autddll.AUTDGetAdapterPointer.argtypes = [POINTER(c_void_p)]
-    autddll.AUTDGetAdapterPointer.restypes = [c_int]
+        self.dll.AUTDAddDevice.argtypes = [
+            c_void_p, c_double, c_double, c_double, c_double, c_double, c_double, c_int]
+        self.dll.AUTDAddDevice.restypes = [c_int]
 
-    autddll.AUTDGetAdapter.argtypes = [
-        c_void_p, c_int, c_char_p, c_char_p]
-    autddll.AUTDGetAdapter.restypes = [None]
+        self.dll.AUTDAddDeviceQuaternion.argtypes = [
+            c_void_p, c_double, c_double, c_double, c_double, c_double, c_double,  c_double, c_int]
+        self.dll.AUTDAddDeviceQuaternion.restypes = [c_int]
 
-    autddll.AUTDFreeAdapterPointer.argtypes = [c_void_p]
-    autddll.AUTDFreeAdapterPointer.restypes = [None]
+        self.dll.AUTDDelDevice.argtypes = [c_void_p, c_int]
+        self.dll.AUTDDelDevice.restypes = [None]
 
-    autddll.AUTDAddDevice.argtypes = [
-        c_void_p, c_double, c_double, c_double, c_double, c_double, c_double, c_int]
-    autddll.AUTDAddDevice.restypes = [c_int]
+        self.dll.AUTDCloseController.argtypes = [c_void_p]
+        self.dll.AUTDCloseController.restypes = [None]
 
-    autddll.AUTDAddDeviceQuaternion.argtypes = [
-        c_void_p, c_double, c_double, c_double, c_double, c_double, c_double,  c_double, c_int]
-    autddll.AUTDAddDeviceQuaternion.restypes = [c_int]
+        self.dll.AUTDFreeController.argtypes = [c_void_p]
+        self.dll.AUTDFreeController.restypes = [None]
 
-    autddll.AUTDDelDevice.argtypes = [c_void_p, c_int]
-    autddll.AUTDDelDevice.restypes = [None]
+        self.dll.AUTDSetSilentMode.argtypes = [c_void_p, c_bool]
+        self.dll.AUTDSetSilentMode.restypes = [None]
 
-    autddll.AUTDCloseController.argtypes = [c_void_p]
-    autddll.AUTDCloseController.restypes = [None]
+        self.dll.AUTDCalibrateModulation.argtypes = [c_void_p]
+        self.dll.AUTDCalibrateModulation.restypes = [c_bool]
 
-    autddll.AUTDFreeController.argtypes = [c_void_p]
-    autddll.AUTDFreeController.restypes = [None]
+        self.dll.AUTDGetAdapterPointer.argtypes = [POINTER(c_void_p)]
+        self.dll.AUTDGetAdapterPointer.restypes = [c_int]
 
-    autddll.AUTDSetSilentMode.argtypes = [c_void_p, c_bool]
-    autddll.AUTDSetSilentMode.restypes = [None]
+        self.dll.AUTDGetAdapter.argtypes = [
+            c_void_p, c_int, c_char_p, c_char_p]
+        self.dll.AUTDGetAdapter.restypes = [None]
 
-    autddll.AUTDCalibrateModulation.argtypes = [c_void_p]
-    autddll.AUTDCalibrateModulation.restypes = [None]
+        self.dll.AUTDFreeAdapterPointer.argtypes = [c_void_p]
+        self.dll.AUTDFreeAdapterPointer.restypes = [None]
 
+        self.dll.AUTDGetFirmwareInfoListPointer.argtypes = [
+            c_void_p, POINTER(c_void_p)]
+        self.dll.AUTDGetFirmwareInfoListPointer.restypes = [c_int]
 
-def __init_property():
-    autddll.AUTDIsOpen.argtypes = [c_void_p]
-    autddll.AUTDIsOpen.restypes = [c_bool]
+        self.dll.AUTDGetFirmwareInfo.argtypes = [
+            c_void_p, c_int, c_char_p, c_char_p]
+        self.dll.AUTDGetFirmwareInfo.restypes = [None]
 
-    autddll.AUTDIsSilentMode.argtypes = [c_void_p]
-    autddll.AUTDIsSilentMode.restypes = [c_bool]
+        self.dll.AUTDFreeFirmwareInfoListPointer.argtypes = [c_void_p]
+        self.dll.AUTDFreeFirmwareInfoListPointer.restypes = [None]
 
-    autddll.AUTDNumDevices.argtypes = [c_void_p]
-    autddll.AUTDNumDevices.restypes = [c_int]
+    def init_property(self):
+        self.dll.AUTDIsOpen.argtypes = [c_void_p]
+        self.dll.AUTDIsOpen.restypes = [c_bool]
 
-    autddll.AUTDNumTransducers.argtypes = [c_void_p]
-    autddll.AUTDNumTransducers.restypes = [c_int]
+        self.dll.AUTDIsSilentMode.argtypes = [c_void_p]
+        self.dll.AUTDIsSilentMode.restypes = [c_bool]
 
-    autddll.AUTDRemainingInBuffer.argtypes = [c_void_p]
-    autddll.AUTDRemainingInBuffer.restypes = [c_long]
+        self.dll.AUTDNumDevices.argtypes = [c_void_p]
+        self.dll.AUTDNumDevices.restypes = [c_int]
 
+        self.dll.AUTDNumTransducers.argtypes = [c_void_p]
+        self.dll.AUTDNumTransducers.restypes = [c_int]
 
-def __init_gain():
-    autddll.AUTDFocalPointGain.argtypes = [
-        POINTER(c_void_p), c_double, c_double, c_double, c_ubyte]
-    autddll.AUTDFocalPointGain.restypes = [None]
+        self.dll.AUTDRemainingInBuffer.argtypes = [c_void_p]
+        self.dll.AUTDRemainingInBuffer.restypes = [c_long]
 
-    autddll.AUTDGroupedGain.argtypes = [
-        POINTER(c_void_p), POINTER(c_int), POINTER(c_void_p), c_int]
-    autddll.AUTDGroupedGain.restypes = [None]
+    def init_gain(self):
+        self.dll.AUTDFocalPointGain.argtypes = [
+            POINTER(c_void_p), c_double, c_double, c_double, c_ubyte]
+        self.dll.AUTDFocalPointGain.restypes = [None]
 
-    autddll.AUTDBesselBeamGain.argtypes = [
-        POINTER(c_void_p), c_double, c_double, c_double, c_double, c_double, c_double, c_double]
-    autddll.AUTDBesselBeamGain.restypes = [None]
+        self.dll.AUTDGroupedGain.argtypes = [
+            POINTER(c_void_p), POINTER(c_int), POINTER(c_void_p), c_int]
+        self.dll.AUTDGroupedGain.restypes = [None]
 
-    autddll.AUTDPlaneWaveGain.argtypes = [
-        POINTER(c_void_p), c_double, c_double, c_double]
-    autddll.AUTDPlaneWaveGain.restypes = [None]
+        self.dll.AUTDBesselBeamGain.argtypes = [
+            POINTER(c_void_p), c_double, c_double, c_double, c_double, c_double, c_double, c_double]
+        self.dll.AUTDBesselBeamGain.restypes = [None]
 
-    autddll.AUTDCustomGain.argtypes = [
-        POINTER(c_void_p), POINTER(c_ubyte), c_int]
-    autddll.AUTDCustomGain.restypes = [None]
+        self.dll.AUTDPlaneWaveGain.argtypes = [
+            POINTER(c_void_p), c_double, c_double, c_double]
+        self.dll.AUTDPlaneWaveGain.restypes = [None]
 
-    autddll.AUTDHoloGain.argtypes = [
-        POINTER(c_void_p), POINTER(c_double), POINTER(c_double), c_int]
-    autddll.AUTDHoloGain.restypes = [None]
+        self.dll.AUTDCustomGain.argtypes = [
+            POINTER(c_void_p), POINTER(c_ubyte), c_int]
+        self.dll.AUTDCustomGain.restypes = [None]
 
-    autddll.AUTDTransducerTestGain.argtypes = [
-        POINTER(c_void_p), c_int, c_int, c_int]
-    autddll.AUTDTransducerTestGain.restypes = [None]
+        self.dll.AUTDHoloGain.argtypes = [
+            POINTER(c_void_p), POINTER(c_double), POINTER(c_double), c_int]
+        self.dll.AUTDHoloGain.restypes = [None]
 
-    autddll.AUTDNullGain.argtypes = [
-        POINTER(c_void_p)]
-    autddll.AUTDNullGain.restypes = [None]
+        self.dll.AUTDTransducerTestGain.argtypes = [
+            POINTER(c_void_p), c_int, c_int, c_int]
+        self.dll.AUTDTransducerTestGain.restypes = [None]
 
-    autddll.AUTDDeleteGain.argtypes = [c_void_p]
-    autddll.AUTDDeleteGain.restypes = [None]
+        self.dll.AUTDNullGain.argtypes = [
+            POINTER(c_void_p)]
+        self.dll.AUTDNullGain.restypes = [None]
 
+        self.dll.AUTDDeleteGain.argtypes = [c_void_p]
+        self.dll.AUTDDeleteGain.restypes = [None]
 
-def __init_modulation():
-    autddll.AUTDModulation.argtypes = [
-        POINTER(c_void_p), c_ubyte]
-    autddll.AUTDModulation.restypes = [None]
+    def __init_modulation(self):
+        self.dll.AUTDModulation.argtypes = [
+            POINTER(c_void_p), c_ubyte]
+        self.dll.AUTDModulation.restypes = [None]
 
-    autddll.AUTDRawPCMModulation.argtypes = [
-        POINTER(c_void_p), c_char_p, c_double]
-    autddll.AUTDRawPCMModulation.restypes = [None]
+        self.dll.AUTDRawPCMModulation.argtypes = [
+            POINTER(c_void_p), c_char_p, c_double]
+        self.dll.AUTDRawPCMModulation.restypes = [None]
 
-    autddll.AUTDRawPCMModulation.argtypes = [
-        POINTER(c_void_p), c_int]
-    autddll.AUTDRawPCMModulation.restypes = [None]
+        self.dll.AUTDRawPCMModulation.argtypes = [
+            POINTER(c_void_p), c_int]
+        self.dll.AUTDRawPCMModulation.restypes = [None]
 
-    autddll.AUTDSineModulation.argtypes = [
-        POINTER(c_void_p), c_int, c_double, c_double]
-    autddll.AUTDSineModulation.restypes = [None]
+        self.dll.AUTDSineModulation.argtypes = [
+            POINTER(c_void_p), c_int, c_double, c_double]
+        self.dll.AUTDSineModulation.restypes = [None]
 
-    autddll.AUTDDeleteModulation.argtypes = [c_void_p]
-    autddll.AUTDDeleteModulation.restypes = [None]
+        self.dll.AUTDWavModulation.argtypes = [
+            POINTER(c_void_p), c_char_p]
+        self.dll.AUTDWavModulation.restypes = [None]
 
+        self.dll.AUTDDeleteModulation.argtypes = [c_void_p]
+        self.dll.AUTDDeleteModulation.restypes = [None]
 
-def __init_low_level_interface():
-    autddll.AUTDAppendGain.argtypes = [
-        c_void_p, c_void_p]
-    autddll.AUTDAppendGain.restypes = [None]
+    def init_low_level_interface(self):
+        self.dll.AUTDAppendGain.argtypes = [
+            c_void_p, c_void_p]
+        self.dll.AUTDAppendGain.restypes = [None]
 
-    autddll.AUTDAppendGainSync.argtypes = [
-        c_void_p, c_void_p]
-    autddll.AUTDAppendGainSync.restypes = [None]
+        self.dll.AUTDAppendGainSync.argtypes = [
+            c_void_p, c_void_p, c_bool]
+        self.dll.AUTDAppendGainSync.restypes = [None]
 
-    autddll.AUTDAppendModulation.argtypes = [
-        c_void_p, c_void_p]
-    autddll.AUTDAppendModulation.restypes = [None]
+        self.dll.AUTDAppendModulation.argtypes = [
+            c_void_p, c_void_p]
+        self.dll.AUTDAppendModulation.restypes = [None]
 
-    autddll.AUTDAppendModulationSync.argtypes = [
-        c_void_p, c_void_p]
-    autddll.AUTDAppendModulationSync.restypes = [None]
+        self.dll.AUTDAppendModulationSync.argtypes = [
+            c_void_p, c_void_p]
+        self.dll.AUTDAppendModulationSync.restypes = [None]
 
-    autddll.AUTDAppendSTMGain.argtypes = [
-        c_void_p, c_void_p]
-    autddll.AUTDAppendSTMGain.restypes = [None]
+        self.dll.AUTDAppendSTMGain.argtypes = [
+            c_void_p, c_void_p]
+        self.dll.AUTDAppendSTMGain.restypes = [None]
 
-    autddll.AUTDStartSTModulation.argtypes = [
-        c_void_p, c_double]
-    autddll.AUTDStartSTModulation.restypes = [None]
+        self.dll.AUTDStartSTModulation.argtypes = [
+            c_void_p, c_double]
+        self.dll.AUTDStartSTModulation.restypes = [None]
 
-    autddll.AUTDStopSTModulation.argtypes = [
-        c_void_p]
-    autddll.AUTDStopSTModulation.restypes = [None]
+        self.dll.AUTDStopSTModulation.argtypes = [
+            c_void_p]
+        self.dll.AUTDStopSTModulation.restypes = [None]
 
-    autddll.AUTDFinishSTModulation.argtypes = [
-        c_void_p]
-    autddll.AUTDFinishSTModulation.restypes = [None]
+        self.dll.AUTDFinishSTModulation.argtypes = [
+            c_void_p]
+        self.dll.AUTDFinishSTModulation.restypes = [None]

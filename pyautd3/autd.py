@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 26/02/2020
+Last Modified: 03/04/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -15,7 +15,9 @@ import ctypes
 from ctypes import c_void_p, byref
 from enum import IntEnum
 
-from . import nativemethods
+from .nativemethods import Nativemethods
+
+NATIVE_METHODDS = Nativemethods("")
 
 
 class LinkType(IntEnum):
@@ -29,7 +31,7 @@ class Gain:
         self.gain_ptr = c_void_p()
 
     def __del__(self):
-        nativemethods.autddll.AUTDDeleteGain(self.gain_ptr)
+        NATIVE_METHODDS.dll.AUTDDeleteGain(self.gain_ptr)
 
 
 class Modulation:
@@ -37,13 +39,13 @@ class Modulation:
         self.modulation_ptr = c_void_p()
 
     def __del__(self):
-        nativemethods.autddll.AUTDDeleteModulation(self.modulation_ptr)
+        NATIVE_METHODDS.dll.AUTDDeleteModulation(self.modulation_ptr)
 
 
 class AUTD:
     def __init__(self):
         self.autd = c_void_p()
-        nativemethods.autddll.AUTDCreateController(byref(self.autd))
+        NATIVE_METHODDS.dll.AUTDCreateController(byref(self.autd))
 
         self.__disposed = False
 
@@ -51,32 +53,50 @@ class AUTD:
         self.dispose()
 
     def open(self, linktype=LinkType.SOEM, location=""):
-        nativemethods.autddll.AUTDOpenController(
+        NATIVE_METHODDS.dll.AUTDOpenController(
             self.autd, int(linktype), location.encode('utf-8'))
 
     @staticmethod
     def enumerate_adapters():
         res = []
         handle = c_void_p()
-        size = nativemethods.autddll.AUTDGetAdapterPointer(byref(handle))
+        size = NATIVE_METHODDS.dll.AUTDGetAdapterPointer(byref(handle))
 
         for i in range(size):
             sb_desc = ctypes.create_string_buffer(128)
             sb_name = ctypes.create_string_buffer(128)
-            nativemethods.autddll.AUTDGetAdapter(
+            NATIVE_METHODDS.dll.AUTDGetAdapter(
                 handle, i, sb_desc, sb_name)
             res.append([sb_name.value.decode('utf-8'),
                         sb_desc.value.decode('utf-8')])
 
-        nativemethods.autddll.AUTDFreeAdapterPointer(handle)
+        NATIVE_METHODDS.dll.AUTDFreeAdapterPointer(handle)
+
+        return res
+
+    def firmware_info_list(self):
+        res = []
+        handle = c_void_p()
+        size = NATIVE_METHODDS.dll.AUTDGetFirmwareInfoListPointer(
+            self.autd, byref(handle))
+
+        for i in range(size):
+            sb_cpu = ctypes.create_string_buffer(128)
+            sb_fpga = ctypes.create_string_buffer(128)
+            NATIVE_METHODDS.dll.AUTDGetFirmwareInfo(
+                handle, i, sb_cpu, sb_fpga)
+            res.append([sb_cpu.value.decode('utf-8'),
+                        sb_fpga.value.decode('utf-8')])
+
+        NATIVE_METHODDS.dll.AUTDFreeFirmwareInfoListPointer(handle)
 
         return res
 
     def close(self):
-        nativemethods.autddll.AUTDCloseController(self.autd)
+        NATIVE_METHODDS.dll.AUTDCloseController(self.autd)
 
     def free(self):
-        nativemethods.autddll.AUTDFreeController(self.autd)
+        NATIVE_METHODDS.dll.AUTDFreeController(self.autd)
 
     def dispose(self):
         if not self.__disposed:
@@ -85,58 +105,59 @@ class AUTD:
             self.__disposed = True
 
     def set_silent(self, silent: bool):
-        nativemethods.autddll.AUTDSetSilentMode(self.autd, silent)
+        NATIVE_METHODDS.dll.AUTDSetSilentMode(self.autd, silent)
 
-    def calibrate_modulation(self, silent: bool):
-        nativemethods.autddll.AUTDCalibrateModulation(self.autd)
+    def calibrate_modulation(self):
+        return NATIVE_METHODDS.dll.AUTDCalibrateModulation(self.autd)
 
-    def add_device(self, pos=[0., 0., 0.], rot=[0., 0., 0.], id=0):
-        nativemethods.autddll.AUTDAddDevice(
-            self.autd, pos[0], pos[1], pos[2], rot[0], rot[1], rot[2], id)
+    def add_device(self, pos, rot, group_id=0):
+        NATIVE_METHODDS.dll.AUTDAddDevice(
+            self.autd, pos[0], pos[1], pos[2], rot[0], rot[1], rot[2], group_id)
 
     @staticmethod
     def focal_point_gain(x, y, z, amp=255):
         gain = Gain()
-        nativemethods.autddll.AUTDFocalPointGain(
+        NATIVE_METHODDS.dll.AUTDFocalPointGain(
             byref(gain.gain_ptr), x, y, z, amp)
         return gain
 
     @staticmethod
     def modulation(amp=255):
         mod = Modulation()
-        nativemethods.autddll.AUTDModulation(
+        NATIVE_METHODDS.dll.AUTDModulation(
             byref(mod.modulation_ptr), amp)
         return mod
 
     @staticmethod
     def sine_modulation(freq, amp=1.0, offset=0.5):
         mod = Modulation()
-        nativemethods.autddll.AUTDSineModulation(
+        NATIVE_METHODDS.dll.AUTDSineModulation(
             byref(mod.modulation_ptr), freq, amp, offset)
         return mod
 
     def append_modulation(self, mod: Modulation):
-        nativemethods.autddll.AUTDAppendModulation(
+        NATIVE_METHODDS.dll.AUTDAppendModulation(
             self.autd, mod.modulation_ptr)
 
     def append_modulation_sync(self, mod: Modulation):
-        nativemethods.autddll.AUTDAppendModulationSync(
+        NATIVE_METHODDS.dll.AUTDAppendModulationSync(
             self.autd, mod.modulation_ptr)
 
     def append_gain(self, gain: Gain):
-        nativemethods.autddll.AUTDAppendGain(self.autd, gain.gain_ptr)
+        NATIVE_METHODDS.dll.AUTDAppendGain(self.autd, gain.gain_ptr)
 
-    def append_gain_sync(self, gain: Gain):
-        nativemethods.autddll.AUTDAppendGainSync(self.autd, gain.gain_ptr)
+    def append_gain_sync(self, gain: Gain, wait_for_send: bool = False):
+        NATIVE_METHODDS.dll.AUTDAppendGainSync(
+            self.autd, gain.gain_ptr, wait_for_send)
 
     def append_stm_gain(self, gain: Gain):
-        nativemethods.autddll.AUTDAppendSTMGain(self.autd, gain.gain_ptr)
+        NATIVE_METHODDS.dll.AUTDAppendSTMGain(self.autd, gain.gain_ptr)
 
     def start_stm(self, freq):
-        nativemethods.autddll.AUTDStartSTModulation(self.autd, freq)
+        NATIVE_METHODDS.dll.AUTDStartSTModulation(self.autd, freq)
 
     def stop_stm(self):
-        nativemethods.autddll.AUTDStopSTModulation(self.autd)
+        NATIVE_METHODDS.dll.AUTDStopSTModulation(self.autd)
 
     def finish_stm(self):
-        nativemethods.autddll.AUTDFinishSTModulation(self.autd)
+        NATIVE_METHODDS.dll.AUTDFinishSTModulation(self.autd)

@@ -1,12 +1,11 @@
-![Windows](https://github.com/shinolab/pyautd/workflows/Windows/badge.svg)
-![Linux](https://github.com/shinolab/pyautd/workflows/Linux/badge.svg)
-![MacOS](https://github.com/shinolab/pyautd/workflows/MacOS/badge.svg)
+![build](https://github.com/shinolab/pyautd/workflows/build/badge.svg)
+![Publish to PyPI](https://github.com/shinolab/pyautd/workflows/Publish%20to%20PyPI/badge.svg)
 
 # pyautd3
 
 [autd3 library](https://github.com/shinolab/autd3-library-software) for python3.6+
 
-version: 0.3.1.4
+version: 0.4.0.0
 
 ## Install
 
