@@ -32,7 +32,7 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=150 --statistics
     - name: Install Test with pip
-      run: pip install git+https://github.com/shinolab/pyautd.git
+      run: pip install git+https://github.com/shinolab/pyautd.git@dev
     - name: Import Test
       if: matrix.os != 'windows-latest'
       run: |

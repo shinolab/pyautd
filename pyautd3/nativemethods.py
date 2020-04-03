@@ -15,25 +15,30 @@ import ctypes
 from ctypes import c_void_p, c_bool, c_int, POINTER, c_double, c_long, c_char_p, c_ubyte
 
 
-class Nativemethods:
-    _instance = None
-    dll = None
+class Singleton(type):
+    _instances = {}
     _lock = threading.Lock()
 
-    def __new__(cls, dlllocation):
-        with cls._lock:
-            if cls._instance is None:
-                cls._instance = super().__new__(cls)
-                cls._instance.dll = ctypes.CDLL(dlllocation)
-                cls._instance.init_controller()
-                cls._instance.init_property()
-                cls._instance.init_gain()
-                cls._instance.init_modulation()
-                cls._instance.init_low_level_interface()
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            with cls._lock:
+                if cls not in cls._instances:
+                    cls._instances[cls] = super(
+                        Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
 
-        return cls._instance
 
-    def init_controller(self):
+class Nativemethods(metaclass=Singleton):
+    def __init__(self, dlllocation):
+        self.dll = ctypes.CDLL(dlllocation)
+
+        self.__init_controller()
+        self.__init_property()
+        self.__init_gain()
+        self.__init_modulation()
+        self.__init_low_level_interface()
+
+    def __init_controller(self):
         self.dll.AUTDCreateController.argtypes = [POINTER(c_void_p)]
         self.dll.AUTDCreateController.restypes = [None]
 
@@ -84,7 +89,7 @@ class Nativemethods:
         self.dll.AUTDFreeFirmwareInfoListPointer.argtypes = [c_void_p]
         self.dll.AUTDFreeFirmwareInfoListPointer.restypes = [None]
 
-    def init_property(self):
+    def __init_property(self):
         self.dll.AUTDIsOpen.argtypes = [c_void_p]
         self.dll.AUTDIsOpen.restypes = [c_bool]
 
@@ -100,7 +105,7 @@ class Nativemethods:
         self.dll.AUTDRemainingInBuffer.argtypes = [c_void_p]
         self.dll.AUTDRemainingInBuffer.restypes = [c_long]
 
-    def init_gain(self):
+    def __init_gain(self):
         self.dll.AUTDFocalPointGain.argtypes = [
             POINTER(c_void_p), c_double, c_double, c_double, c_ubyte]
         self.dll.AUTDFocalPointGain.restypes = [None]
@@ -160,7 +165,7 @@ class Nativemethods:
         self.dll.AUTDDeleteModulation.argtypes = [c_void_p]
         self.dll.AUTDDeleteModulation.restypes = [None]
 
-    def init_low_level_interface(self):
+    def __init_low_level_interface(self):
         self.dll.AUTDAppendGain.argtypes = [
             c_void_p, c_void_p]
         self.dll.AUTDAppendGain.restypes = [None]
