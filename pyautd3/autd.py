@@ -17,7 +17,7 @@ from enum import IntEnum
 
 from .nativemethods import Nativemethods
 
-NATIVE_METHODDS = Nativemethods("")
+NATIVE_METHODDS = Nativemethods()
 
 
 class LinkType(IntEnum):

@@ -35,4 +35,4 @@ __version__ = '0.4.0.0'
 
 LIB_PATH = os.path.join(os.path.dirname(__file__),
                         'bin', PREFIX + 'autd3capi' + EXT)
-_ = Nativemethods(LIB_PATH)
+Nativemethods().init_dll(LIB_PATH)

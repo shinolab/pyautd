@@ -29,7 +29,9 @@ class Singleton(type):
 
 
 class Nativemethods(metaclass=Singleton):
-    def __init__(self, dlllocation):
+    dll = None
+
+    def init_dll(self, dlllocation):
         self.dll = ctypes.CDLL(dlllocation)
 
         self.__init_controller()
