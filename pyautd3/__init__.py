@@ -31,7 +31,7 @@ elif PLATFORM == 'Linux':
     EXT = '.so'
 
 __all__ = ['LinkType', 'AUTD']
-__version__ = '0.4.0.0'
+__version__ = '0.4.0.2'
 
 LIB_PATH = os.path.join(os.path.dirname(__file__),
                         'bin', PREFIX + 'autd3capi' + EXT)

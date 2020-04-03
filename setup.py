@@ -27,50 +27,52 @@ def _set_package_version(version):
         f.write(init_py)
 
 
-_pf = platform.system()
-_os = ''
-_lib_ext = ''
-if _pf == 'Windows':
-    _os = 'win-x64'
-    _lib_ext = ".dll"
-elif _pf == 'Darwin':
-    _os = 'macos-x64'
-    _lib_ext = ".dylib"
-elif _pf == 'Linux':
-    _os = 'linux-x64'
-    _lib_ext = ".so"
-else:
-    raise ImportError('Not supported OS')
+support_os = ['win-x64', 'macos-x64', 'linux-x64']
 
-_AssetsBaseURL = 'https://github.com/shinolab/autd3-library-software/releases/download/'
-_Version = 'v' + '.'.join(_get_version().split('.')[0:3])
-_Version = _Version.strip()
-_set_package_version(_get_version())
+for target_os in support_os:
+    _lib_ext = ''
+    _archive_ext = ''
+    if target_os.startswith('win'):
+        _lib_ext = ".dll"
+        _archive_ext = '.zip'
+    elif target_os.startswith('mac'):
+        _lib_ext = ".dylib"
+        _archive_ext = '.tar.gz'
+    elif target_os.startswith('linux'):
+        _lib_ext = ".so"
+        _archive_ext = '.tar.gz'
+    else:
+        raise ImportError('Not supported OS')
 
-module_path = './pyautd3/'
-ext = '.zip' if _os.startswith('win') else '.tar.gz'
-url = _AssetsBaseURL + _Version + '/autd3-' + _Version + '-' + _os + ext
+    _AssetsBaseURL = 'https://github.com/shinolab/autd3-library-software/releases/download/'
+    _Version = 'v' + '.'.join(_get_version().split('.')[0:3])
+    _Version = _Version.strip()
+    _set_package_version(_get_version())
 
-tmp_archive_path = module_path + 'tmp' + ext
+    module_path = './pyautd3/'
+    url = _AssetsBaseURL + _Version + '/autd3-' + \
+        _Version + '-' + target_os + _archive_ext
 
-res = requests.get(url, stream=True)
-with open(tmp_archive_path, 'wb') as fp:
-    shutil.copyfileobj(res.raw, fp)
+    tmp_archive_path = module_path + 'tmp' + _archive_ext
 
-if ext == '.zip':
-    with zipfile.ZipFile(tmp_archive_path) as zfile:
-        for info in zfile.infolist():
-            if info.filename.startswith('bin') and info.filename.endswith(_lib_ext):
-                zfile.extract(info, module_path)
-elif ext == '.tar.gz':
-    with tarfile.open(tmp_archive_path) as tarfile:
-        libraries = []
-        for i in tarfile.getmembers():
-            if i.name.startswith('bin') and i.name.endswith(_lib_ext):
-                libraries.append(i)
-        tarfile.extractall(path=module_path, members=libraries)
+    res = requests.get(url, stream=True)
+    with open(tmp_archive_path, 'wb') as fp:
+        shutil.copyfileobj(res.raw, fp)
 
-os.remove(tmp_archive_path)
+    if _archive_ext == '.zip':
+        with zipfile.ZipFile(tmp_archive_path) as zfile:
+            for info in zfile.infolist():
+                if info.filename.startswith('bin') and info.filename.endswith(_lib_ext):
+                    zfile.extract(info, module_path)
+    elif _archive_ext == '.tar.gz':
+        with tarfile.open(tmp_archive_path) as tarfile:
+            libraries = []
+            for i in tarfile.getmembers():
+                if i.name.startswith('bin') and i.name.endswith(_lib_ext):
+                    libraries.append(i)
+            tarfile.extractall(path=module_path, members=libraries)
+
+    os.remove(tmp_archive_path)
 
 with open('readme.md', 'r') as fh:
     long_description = fh.read()
