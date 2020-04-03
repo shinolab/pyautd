@@ -1,10 +1,10 @@
-import setuptools
 import shutil
-import requests
-import platform
 import zipfile
-import os
 import tarfile
+import os
+
+import setuptools
+import requests
 
 
 def _get_version():
@@ -96,7 +96,7 @@ setuptools.setup(
     package_dir={'pyautd3': 'pyautd3'},
     packages=['pyautd3'],
     package_data={
-        'pyautd3': ['bin/*' + _lib_ext],
+        'pyautd3': ['bin/*'],
     },
     python_requires='>=3.6',
 )
