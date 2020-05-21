@@ -14,9 +14,8 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 import os.path
 import platform
 
-from pyautd3.autd import LinkType
+from pyautd3.autd import LinkType, Link, AUTD
 from pyautd3.nativemethods import Nativemethods
-from pyautd3.autd import AUTD
 
 PLATFORM = platform.system()
 PREFIX = ''
