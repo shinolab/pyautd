@@ -5,7 +5,7 @@
 
 [autd3 library](https://github.com/shinolab/autd3-library-software) for python3.6+
 
-version: 0.4.0
+version: 0.4.1
 
 ## Install
 
@@ -33,7 +33,7 @@ sudo python
 ```python
 import sys
 
-from pyautd3 import AUTD, LinkType
+from pyautd3 import AUTD, Link
 
 
 def get_adapter_name():
@@ -53,7 +53,8 @@ if __name__ == '__main__':
     autd.add_device([0, 0, 0], [0, 0, 0])
     # autd.add_device([0, 0, 0], [0, 0, 0])
 
-    autd.open(LinkType.SOEM, ifname)
+    link = Link.soem_link(ifname, 1)
+    autd.open_with(link)
 
     firm_info_list = autd.firmware_info_list()
     for i, firm in enumerate(firm_info_list):
