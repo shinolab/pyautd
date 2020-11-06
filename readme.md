@@ -5,7 +5,7 @@
 
 [autd3 library](https://github.com/shinolab/autd3-library-software) for python3.6+
 
-version: 0.4.1
+version: 0.7.0
 
 ## Install
 
@@ -33,11 +33,11 @@ sudo python
 ```python
 import sys
 
-from pyautd3 import AUTD, Link
+from pyautd3 import AUTD, Link, Gain, Modulation, Sequence  # NOQA
 
 
 def get_adapter_name():
-    adapters = AUTD.enumerate_adapters()
+    adapters = Link.enumerate_adapters()
     for i, adapter in enumerate(adapters):
         print('[' + str(i) + ']: ' + adapter[0] + ', ' + adapter[1])
 
@@ -46,22 +46,25 @@ def get_adapter_name():
 
 
 if __name__ == '__main__':
-    ifname = get_adapter_name()
 
     autd = AUTD()
 
-    autd.add_device([0, 0, 0], [0, 0, 0])
-    # autd.add_device([0, 0, 0], [0, 0, 0])
+    autd.add_device([0., 0., 0.], [0., 0., 0.])
+    # autd.add_device([0., 0., 0.], [0., 0., 0.])
 
-    link = Link.soem_link(ifname, 1)
+    ifname = get_adapter_name()
+    link = Link.soem_link(ifname, autd.num_devices())
     autd.open_with(link)
+
+    autd.clear()
+    autd.calibrate()
 
     firm_info_list = autd.firmware_info_list()
     for i, firm in enumerate(firm_info_list):
-        print('[' + str(i) + ']: CPU: ' + firm[0] + ', FPGA' + firm[1])
+        print('[' + str(i) + ']: CPU: ' + firm[0] + ', FPGA: ' + firm[1])
 
-    f = AUTD.focal_point_gain(90, 80, 150)
-    m = AUTD.sine_modulation(150)
+    f = Gain.focal_point([90., 80., 150.])
+    m = Modulation.sine_wave(150)
 
     autd.append_gain_sync(f)
     autd.append_modulation_sync(m)
@@ -69,11 +72,11 @@ if __name__ == '__main__':
     print('press enter to start stm...')
     sys.stdin.readline()
 
-    m = AUTD.modulation(255)
+    m = Modulation.static(255)
     autd.append_modulation_sync(m)
 
-    f1 = AUTD.focal_point_gain(87.5, 80, 150)
-    f2 = AUTD.focal_point_gain(92.5, 80, 150)
+    f1 = Gain.focal_point([87.5, 80., 150.])
+    f2 = Gain.focal_point([92.5, 80., 150.])
     autd.append_stm_gain(f1)
     autd.append_stm_gain(f2)
 
@@ -81,8 +84,6 @@ if __name__ == '__main__':
 
     print('press enter to exit...')
     sys.stdin.readline()
-
-    autd.finish_stm()
 
     autd.dispose()
 ```

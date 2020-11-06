@@ -11,7 +11,7 @@ def _get_version():
     with open('readme.md', 'r') as f:
         for line in f.readlines():
             if line.startswith('version: '):
-                return line.replace('version: ', '')
+                return line.replace('version: ', '').strip()
     raise LookupError('version info is not found in readme.md')
 
 

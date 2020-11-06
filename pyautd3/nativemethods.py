@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 21/05/2020
+Last Modified: 06/11/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -13,7 +13,7 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 import threading
 import ctypes
-from ctypes import c_void_p, c_bool, c_int, POINTER, c_double, c_long, c_char_p, c_ubyte
+from ctypes import c_void_p, c_bool, c_int, POINTER, c_double, c_long, c_char_p, c_ubyte, c_uint, c_ulong, c_ushort
 
 
 class Singleton(type):
@@ -38,15 +38,13 @@ class Nativemethods(metaclass=Singleton):
         self.__init_property()
         self.__init_gain()
         self.__init_modulation()
+        self.__init__sequence()
         self.__init_low_level_interface()
         self.__init_link()
 
     def __init_controller(self):
-        self.dll.AUTDCreateController.argtypes = [POINTER(c_void_p)]
+        self.dll.AUTDCreateController.argtypes = [POINTER(c_void_p), c_int]
         self.dll.AUTDCreateController.restypes = [None]
-
-        self.dll.AUTDOpenController.argtypes = [c_void_p, c_int, c_char_p]
-        self.dll.AUTDOpenController.restypes = [c_int]
 
         self.dll.AUTDOpenControllerWith.argtypes = [c_void_p, c_void_p]
         self.dll.AUTDOpenControllerWith.restypes = [c_int]
@@ -60,17 +58,23 @@ class Nativemethods(metaclass=Singleton):
         self.dll.AUTDDelDevice.argtypes = [c_void_p, c_int]
         self.dll.AUTDDelDevice.restypes = [None]
 
+        self.dll.AUTDCalibrate.argtypes = [c_void_p, c_int, c_int]
+        self.dll.AUTDCalibrate.restypes = [c_bool]
+
+        self.dll.AUTDStop.argtypes = [c_void_p]
+        self.dll.AUTDStop.restypes = [None]
+
         self.dll.AUTDCloseController.argtypes = [c_void_p]
         self.dll.AUTDCloseController.restypes = [None]
+
+        self.dll.AUTDClear.argtypes = [c_void_p]
+        self.dll.AUTDClear.restypes = [None]
 
         self.dll.AUTDFreeController.argtypes = [c_void_p]
         self.dll.AUTDFreeController.restypes = [None]
 
         self.dll.AUTDSetSilentMode.argtypes = [c_void_p, c_bool]
         self.dll.AUTDSetSilentMode.restypes = [None]
-
-        self.dll.AUTDCalibrateModulation.argtypes = [c_void_p]
-        self.dll.AUTDCalibrateModulation.restypes = [c_bool]
 
         self.dll.AUTDGetAdapterPointer.argtypes = [POINTER(c_void_p)]
         self.dll.AUTDGetAdapterPointer.restypes = [c_int]
@@ -113,19 +117,19 @@ class Nativemethods(metaclass=Singleton):
         self.dll.AUTDGroupedGain.argtypes = [POINTER(c_void_p), POINTER(c_int), POINTER(c_void_p), c_int]
         self.dll.AUTDGroupedGain.restypes = [None]
 
-        self.dll.AUTDBesselBeamGain.argtypes = [POINTER(c_void_p), c_double, c_double, c_double, c_double, c_double, c_double, c_double]
+        self.dll.AUTDBesselBeamGain.argtypes = [POINTER(c_void_p), c_double, c_double, c_double, c_double, c_double, c_double, c_double, c_ubyte]
         self.dll.AUTDBesselBeamGain.restypes = [None]
 
-        self.dll.AUTDPlaneWaveGain.argtypes = [POINTER(c_void_p), c_double, c_double, c_double]
+        self.dll.AUTDPlaneWaveGain.argtypes = [POINTER(c_void_p), c_double, c_double, c_double, c_ubyte]
         self.dll.AUTDPlaneWaveGain.restypes = [None]
 
         self.dll.AUTDCustomGain.argtypes = [POINTER(c_void_p), POINTER(c_ubyte), c_int]
         self.dll.AUTDCustomGain.restypes = [None]
 
-        self.dll.AUTDHoloGain.argtypes = [POINTER(c_void_p), POINTER(c_double), POINTER(c_double), c_int]
+        self.dll.AUTDHoloGain.argtypes = [POINTER(c_void_p), POINTER(c_double), POINTER(c_double), c_int, c_int, c_void_p]
         self.dll.AUTDHoloGain.restypes = [None]
 
-        self.dll.AUTDTransducerTestGain.argtypes = [POINTER(c_void_p), c_int, c_int, c_int]
+        self.dll.AUTDTransducerTestGain.argtypes = [POINTER(c_void_p), c_int, c_ubyte, c_ubyte]
         self.dll.AUTDTransducerTestGain.restypes = [None]
 
         self.dll.AUTDNullGain.argtypes = [POINTER(c_void_p)]
@@ -138,14 +142,20 @@ class Nativemethods(metaclass=Singleton):
         self.dll.AUTDModulation.argtypes = [POINTER(c_void_p), c_ubyte]
         self.dll.AUTDModulation.restypes = [None]
 
+        self.dll.AUTDCustomModulation.argtypes = [POINTER(c_void_p), POINTER(c_ubyte), c_uint]
+        self.dll.AUTDCustomModulation.restypes = [None]
+
         self.dll.AUTDRawPCMModulation.argtypes = [POINTER(c_void_p), c_char_p, c_double]
         self.dll.AUTDRawPCMModulation.restypes = [None]
 
-        self.dll.AUTDRawPCMModulation.argtypes = [POINTER(c_void_p), c_int]
-        self.dll.AUTDRawPCMModulation.restypes = [None]
+        self.dll.AUTDSawModulation.argtypes = [POINTER(c_void_p), c_int]
+        self.dll.AUTDSawModulation.restypes = [None]
 
         self.dll.AUTDSineModulation.argtypes = [POINTER(c_void_p), c_int, c_double, c_double]
         self.dll.AUTDSineModulation.restypes = [None]
+
+        self.dll.AUTDSquareModulation.argtypes = [POINTER(c_void_p), c_int, c_ubyte, c_ubyte]
+        self.dll.AUTDSquareModulation.restypes = [None]
 
         self.dll.AUTDWavModulation.argtypes = [POINTER(c_void_p), c_char_p]
         self.dll.AUTDWavModulation.restypes = [None]
@@ -153,15 +163,43 @@ class Nativemethods(metaclass=Singleton):
         self.dll.AUTDDeleteModulation.argtypes = [c_void_p]
         self.dll.AUTDDeleteModulation.restypes = [None]
 
+    def __init__sequence(self):
+        self.dll.AUTDSequence.argtypes = [POINTER(c_void_p)]
+        self.dll.AUTDSequence.restypes = [None]
+
+        self.dll.AUTDSequenceAppnedPoint.argtypes = [c_void_p, c_double, c_double, c_double]
+        self.dll.AUTDSequenceAppnedPoint.restypes = [None]
+
+        self.dll.AUTDSequenceAppnedPoints.argtypes = [c_void_p, POINTER(c_double), c_ulong]
+        self.dll.AUTDSequenceAppnedPoints.restypes = [None]
+
+        self.dll.AUTDSequenceSetFreq.argtypes = [c_void_p, c_double]
+        self.dll.AUTDSequenceSetFreq.restypes = [c_double]
+
+        self.dll.AUTDSequenceFreq.argtypes = [c_void_p]
+        self.dll.AUTDSequenceFreq.restypes = [c_double]
+
+        self.dll.AUTDSequenceSamplingFreq.argtypes = [c_void_p]
+        self.dll.AUTDSequenceSamplingFreq.restypes = [c_double]
+
+        self.dll.AUTDSequenceSamplingFreqDiv.argtypes = [c_void_p]
+        self.dll.AUTDSequenceSamplingFreqDiv.restypes = [c_ushort]
+
+        self.dll.AUTDCircumSequence.argtypes = [c_void_p, c_double, c_double, c_double, c_double, c_double, c_double, c_double, c_ulong]
+        self.dll.AUTDCircumSequence.restypes = [None]
+
+        self.dll.AUTDDeleteSequence.argtypes = [c_void_p]
+        self.dll.AUTDDeleteSequence.restypes = [None]
+
     def __init_link(self):
         self.dll.AUTDSOEMLink.argtypes = [POINTER(c_void_p), c_char_p, c_int]
         self.dll.AUTDSOEMLink.restypes = [None]
 
-        self.dll.AUTDEtherCATLink.argtypes = [POINTER(c_void_p), c_char_p, c_char_p]
-        self.dll.AUTDEtherCATLink.restypes = [None]
+        self.dll.AUTDTwinCATLink.argtypes = [POINTER(c_void_p), c_char_p, c_char_p]
+        self.dll.AUTDTwinCATLink.restypes = [None]
 
-        self.dll.AUTDLocalEtherCATLink.argtypes = [POINTER(c_void_p)]
-        self.dll.AUTDLocalEtherCATLink.restypes = [None]
+        self.dll.AUTDLocalTwinCATLink.argtypes = [POINTER(c_void_p)]
+        self.dll.AUTDLocalTwinCATLink.restypes = [None]
 
         self.dll.AUTDEmulatorLink.argtypes = [POINTER(c_void_p), c_char_p, c_int, c_void_p]
         self.dll.AUTDEmulatorLink.restypes = [None]
@@ -190,3 +228,6 @@ class Nativemethods(metaclass=Singleton):
 
         self.dll.AUTDFinishSTModulation.argtypes = [c_void_p]
         self.dll.AUTDFinishSTModulation.restypes = [None]
+
+        self.dll.AUTDAppendSequence.argtypes = [c_void_p, c_void_p]
+        self.dll.AUTDAppendSequence.restypes = [None]
