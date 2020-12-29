@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 06/11/2020
+Last Modified: 29/12/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,7 +12,7 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 '''
 
 import ctypes
-from ctypes import c_void_p, byref, Structure, c_double, c_int, c_bool
+from ctypes import c_void_p, byref, Structure, c_float, c_int, c_bool
 from enum import IntEnum
 import math
 import numpy as np
@@ -20,12 +20,6 @@ import numpy as np
 from .nativemethods import Nativemethods
 
 NATIVE_METHODDS = Nativemethods()
-
-
-class AUTDVersion(IntEnum):
-    V_0_1 = 0
-    V_0_6 = 1
-    V_0_7 = 2
 
 
 class ModSamplingFreq(IntEnum):
@@ -66,7 +60,7 @@ class OptMethod(IntEnum):
 
 
 class SDPParams(Structure):
-    _fields_ = [("regularization", c_double), ("repeat", c_int), ("plambda", c_double), ("normalize_amp", c_bool)]
+    _fields_ = [("regularization", c_float), ("repeat", c_int), ("plambda", c_float), ("normalize_amp", c_bool)]
 
     def __init__(self):
         super().__init__()
@@ -77,7 +71,7 @@ class SDPParams(Structure):
 
 
 class EVDParams(Structure):
-    _fields_ = [("regularization", c_double), ("normalize_amp", c_bool)]
+    _fields_ = [("regularization", c_float), ("normalize_amp", c_bool)]
 
     def __init__(self):
         super().__init__()
@@ -86,7 +80,7 @@ class EVDParams(Structure):
 
 
 class NLSParams(Structure):
-    _fields_ = [("eps1", c_double), ("eps2", c_double), ("k_max", c_double), ("tau", c_double)]
+    _fields_ = [("eps1", c_float), ("eps2", c_float), ("k_max", c_float), ("tau", c_float)]
 
     def __init__(self):
         super().__init__()
@@ -167,9 +161,9 @@ class Gain:
     @staticmethod
     def holo(foci, amps, method: OptMethod = OptMethod.SDP, params=None):
         size = len(foci)
-        amps = np.array(amps).astype(np.float64)
+        amps = np.array(amps).astype(np.float32)
         amps = np.ctypeslib.as_ctypes(amps)
-        foci_array = np.zeros([size * 3]).astype(np.float64)
+        foci_array = np.zeros([size * 3]).astype(np.float32)
         for i, focus in enumerate(foci):
             foci_array[3 * i] = focus[0]
             foci_array[3 * i + 1] = focus[1]
@@ -277,7 +271,7 @@ class Sequence:
 
     def add_points(self, points):
         size = len(points)
-        points_array = np.zeros([size * 3]).astype(np.float64)
+        points_array = np.zeros([size * 3]).astype(np.float32)
         for i, p in enumerate(points):
             points_array[3 * i] = p[0]
             points_array[3 * i + 1] = p[1]
@@ -339,9 +333,9 @@ class Link:
 
 
 class AUTD:
-    def __init__(self, version: AUTDVersion = AUTDVersion.V_0_7):
+    def __init__(self):
         self.p_cnt = c_void_p()
-        NATIVE_METHODDS.dll.AUTDCreateController(byref(self.p_cnt), int(version))
+        NATIVE_METHODDS.dll.AUTDCreateController(byref(self.p_cnt))
         self.__disposed = False
 
     def __del__(self):
@@ -377,11 +371,15 @@ class AUTD:
     def add_device_quaternion(self, pos, q, group_id=0):
         return NATIVE_METHODDS.dll.AUTDAddDeviceQuaternion(self.p_cnt, pos[0], pos[1], pos[2], q[0], q[1], q[2], q[3], group_id)
 
-    def del_device(self, dev_idx):
-        NATIVE_METHODDS.dll.AUTDDelDevice(self.p_cnt, dev_idx)
-
     def calibrate(self, config: Configuration = Configuration()):
         return NATIVE_METHODDS.dll.AUTDCalibrate(self.p_cnt, int(config.mod_sample_freq), int(config.mod_buf_size))
+
+    def set_delay(self, delays):
+        size = len(delays)
+        data = np.array(delays).astype(np.uint16)
+        data = np.ctypeslib.as_ctypes(data)
+
+        NATIVE_METHODDS.dll.AUTDSetDelay(self.p_cnt, data, size)
 
     def stop(self):
         NATIVE_METHODDS.dll.AUTDStop(self.p_cnt)
@@ -398,11 +396,17 @@ class AUTD:
     def set_silent(self, silent: bool):
         NATIVE_METHODDS.dll.AUTDSetSilentMode(self.p_cnt, silent)
 
+    def set_wavelength(self, wavelength: float):
+        NATIVE_METHODDS.dll.AUTDSetWavelength(self.p_cnt, wavelength)
+
     def is_open(self):
         return NATIVE_METHODDS.dll.AUTDIsOpen(self.p_cnt)
 
     def is_silent(self):
         return NATIVE_METHODDS.dll.AUTDIsSilentMode(self.p_cnt)
+
+    def wavelength(self):
+        return NATIVE_METHODDS.dll.AUTDWavelength(self.p_cnt)
 
     def num_devices(self):
         return NATIVE_METHODDS.dll.AUTDNumDevices(self.p_cnt)

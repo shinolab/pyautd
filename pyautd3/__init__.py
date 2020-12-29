@@ -4,7 +4,7 @@ Project: pyautd
 Created Date: 11/02/2020
 Author: Shun Suzuki
 -----
-Last Modified: 16/11/2020
+Last Modified: 29/12/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -14,7 +14,7 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 import os.path
 import platform
 
-from pyautd3.autd import AUTDVersion, ModSamplingFreq, ModBufSize, Configuration, OptMethod, SDPParams, EVDParams, NLSParams
+from pyautd3.autd import ModSamplingFreq, ModBufSize, Configuration, OptMethod, SDPParams, EVDParams, NLSParams
 from pyautd3.autd import Gain, Modulation, Sequence, Link, AUTD
 from pyautd3.nativemethods import Nativemethods
 
@@ -45,7 +45,7 @@ __all__ = [
     'Sequence',
     'AUTD',
     'Link']
-__version__ = '0.7.1'
+__version__ = '0.8.0'
 
 LIB_PATH = os.path.join(os.path.dirname(__file__), 'bin', PREFIX + 'autd3capi' + EXT)
 Nativemethods().init_dll(LIB_PATH)
