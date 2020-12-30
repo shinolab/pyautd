@@ -135,6 +135,4 @@ dmypy.json
 .pytype/
 
 pyautd3/bin/
-*.ps1
 .vscode/
-local_test.py

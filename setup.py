@@ -8,11 +8,11 @@ import requests
 
 
 def _get_version():
-    with open('readme.md', 'r') as f:
+    with open('README.md', 'r') as f:
         for line in f.readlines():
             if line.startswith('version: '):
                 return line.replace('version: ', '').strip()
-    raise LookupError('version info is not found in readme.md')
+    raise LookupError('version info is not found in README.md')
 
 
 def _set_package_version(version):
@@ -74,7 +74,7 @@ for target_os in support_os:
 
     os.remove(tmp_archive_path)
 
-with open('readme.md', 'r') as fh:
+with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setuptools.setup(
