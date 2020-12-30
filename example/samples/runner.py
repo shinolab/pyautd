@@ -13,11 +13,15 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 from pyautd3 import AUTD
 
-from . import simple
+from . import simple, bessel, holo, stm, seq
 
 def run(autd:AUTD):
     samples = [
-        (simple.simple, "Single Focal Point Sample")
+        (simple.simple, "Single Focal Point Sample"),
+        (bessel.bessel, "Bessel beam Sample"),
+        (holo.holo, "Multiple Focal Points Sample"),
+        (stm.stm, "Spatio-Temporal Modulation Sample"),
+        (seq.seq, "PointSequence (Hardware STM) Sample")
     ]
 
     autd.clear()

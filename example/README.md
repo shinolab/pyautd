@@ -1,0 +1,3 @@
+# README
+
+run `soem.py`

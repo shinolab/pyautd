@@ -1,5 +1,5 @@
 '''
-File: simple.py
+File: holo.py
 Project: samples
 Created Date: 30/12/2020
 Author: Shun Suzuki
@@ -13,10 +13,16 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 from pyautd3 import AUTD, Gain, Modulation
 
-def simple(autd:AUTD):
+def holo(autd:AUTD):
     autd.set_silent_mode(True)
 
-    f = Gain.focal_point([90., 80., 150.])
+    foci = [
+        [120., 80., 150.],
+        [60., 80., 150.],
+    ]
+    amps = [1.0, 1.0]
+
+    f = Gain.holo(foci, amps)
     m = Modulation.sine_wave(150)
 
     autd.append_gain_sync(f)

@@ -36,4 +36,4 @@ if __name__ == '__main__':
     link = Link.soem_link(ifname, autd.num_devices())
     autd.open_with(link)
 
-    runner.run()
+    runner.run(autd)
