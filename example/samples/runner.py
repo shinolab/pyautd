@@ -15,7 +15,8 @@ from pyautd3 import AUTD
 
 from . import simple, bessel, holo, stm, seq
 
-def run(autd:AUTD):
+
+def run(autd: AUTD):
     samples = [
         (simple.simple, "Single Focal Point Sample"),
         (bessel.bessel, "Bessel beam Sample"),
@@ -38,7 +39,7 @@ def run(autd:AUTD):
             print(f'[{i}]: {name}')
         print('[Other]: finish')
         print('Choose number: ')
-        
+
         idx = input()
         idx = int(idx) if idx.isdigit() else None
         if idx is None or idx >= len(samples):

@@ -13,8 +13,9 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 from pyautd3 import AUTD, Modulation, Sequence
 
-def seq(autd:AUTD):
-    autd.set_silent_mode(False)
+
+def seq(autd: AUTD):
+    autd.set_silent(False)
 
     x = 90.0
     y = 80.0
@@ -22,12 +23,12 @@ def seq(autd:AUTD):
 
     m = Modulation.static()
     autd.append_modulation_sync(m)
-    
+
     radius = 30.0
     size = 200
     center = [x, y, z]
     normal = [0., 0., 1.]
     seq = Sequence.circum(center, normal, radius, size)
-    _ = seq.SetFrequency(200)
-    
+    _ = seq.set_frequency(200)
+
     autd.append_sequence(seq)

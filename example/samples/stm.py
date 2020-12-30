@@ -15,8 +15,9 @@ import math
 
 from pyautd3 import AUTD, Gain, Modulation
 
-def stm(autd:AUTD):
-    autd.set_silent_mode(False)
+
+def stm(autd: AUTD):
+    autd.set_silent(False)
 
     x = 90.0
     y = 80.0
@@ -24,7 +25,7 @@ def stm(autd:AUTD):
 
     m = Modulation.static()
     autd.append_modulation_sync(m)
-    
+
     radius = 30.0
     size = 200
     for i in range(size):
@@ -32,6 +33,5 @@ def stm(autd:AUTD):
         r = [x + radius * math.cos(theta), y + radius * math.sin(theta), z]
         f = Gain.focal_point(r)
         autd.append_stm_gain(f)
-        
+
     autd.start_stm(1)
-    

@@ -13,8 +13,9 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 
 from pyautd3 import AUTD, Gain, Modulation
 
-def holo(autd:AUTD):
-    autd.set_silent_mode(True)
+
+def holo(autd: AUTD):
+    autd.set_silent(True)
 
     foci = [
         [120., 80., 150.],
@@ -27,4 +28,3 @@ def holo(autd:AUTD):
 
     autd.append_gain_sync(f)
     autd.append_modulation_sync(m)
-    
